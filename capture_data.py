@@ -33,11 +33,12 @@ def capture_data_init(parent_frame, menu):
     * The red square border detects the face, and the number at the top left indicates the number of frames that have been captured.
     * The system needs to capture 70 frames of the face before adding the data into the system.
     * Make sure to adjust your face to face straight towards the camera so the system can detect your face.
+    * Press 'e' key while system capturing your face to stop and exit the process
     """
 
     # Create a label for the instruction text
     instruction_label = Label(capture_face_frame, text=instruction_text, justify=LEFT, font=("Georgia", 12))
-    instruction_label.pack(anchor="center", pady=20, padx=20)
+    instruction_label.pack(anchor="center", pady=12, padx=20)
 
     form_instruction = Label(capture_face_frame, text="Please fill in name and matric no before start capturing!", bg="#86c287")
     form_instruction.pack(anchor="center", pady=2)
