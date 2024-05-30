@@ -3,6 +3,10 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/.venv" />
+      <excludeFolder url="file://$MODULE_DIR$/build" />
+      <excludeFolder url="file://$MODULE_DIR$/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/old files/v1.2" />
+      <excludeFolder url="file://$MODULE_DIR$/old files/v1/Attendance" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.9 (FaceRecognition)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
