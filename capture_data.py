@@ -2,16 +2,17 @@ import cv2
 import numpy as np
 import os
 import pickle
-from tkinter import *
+from tkinter import Tk, Frame, Label, Button, BOTH, Entry, LEFT
 from PIL import Image, ImageTk
 
 
-global capture_face_frame, is_success, menu_function
+global capture_face_frame, is_success, menu_function, camera_index
 
 
-def capture_data_init(parent_frame, menu):
-    global capture_face_frame, menu_function
+def capture_data_init(parent_frame, menu, camera_no):
+    global capture_face_frame, menu_function, camera_index
     menu_function = menu
+    camera_index = camera_no
 
     capture_face_frame = Frame(parent_frame,  width=1152, height=710, bg="#86c287")
     capture_face_frame.pack(anchor="center", fill=BOTH, pady=50, padx=55)
@@ -31,7 +32,7 @@ def capture_data_init(parent_frame, menu):
 
     instruction_text = """
     * The red square border detects the face, and the number at the top left indicates the number of frames that have been captured.
-    * The system needs to capture 70 frames of the face before adding the data into the system.
+    * The system needs to capture 50 frames of the face before adding the data into the system.
     * Make sure to adjust your face to face straight towards the camera so the system can detect your face.
     * Press 'e' key while system capturing your face to stop and exit the process
     """
@@ -61,8 +62,15 @@ def capture_data_init(parent_frame, menu):
     matric_entry = Entry(form_frame, width=50)
     matric_entry.grid(row=1, column=1, padx=20, pady=5)
 
+    # camera_entry = Entry(capture_face_frame, width=10)
+    # camera_entry.grid( padx=20, pady=5)
+    # camera_entry.insert(0,"0")
+
     start_capture_button = Button(capture_face_frame, font=("Georgia", 12), text="Start Capture", command=lambda : check_capture(name_entry, matric_entry))
     start_capture_button.pack(anchor="center", pady=5, padx=5)
+
+
+
 
 def check_capture(name_entry, matric_entry):
     global is_success
@@ -97,9 +105,12 @@ def after_capture_feedback(name_matric):
 
 
 def capture_data(person_info):
+
+
     # Initialize video capture and face detector
-    video = cv2.VideoCapture(0)  # 0 for webcam
+    video = cv2.VideoCapture(camera_index)  # 0 for webcam
     facedetect = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
+
 
     face_data = []
     i = 0
@@ -113,7 +124,7 @@ def capture_data(person_info):
         for (x, y, w, h) in faces:
             crop_img = frame[y:y + h, x:x + w, :]
             resized_img = cv2.resize(crop_img, (100, 100))
-            if len(face_data) < 70 and i % 10 == 0:
+            if len(face_data) < 50 and i % 10 == 0:
                 face_data.append(resized_img)
             i += 1
             cv2.putText(frame, str(len(face_data)), (100, 100), cv2.FONT_HERSHEY_COMPLEX, 1, (100, 100, 255), 1)
@@ -127,16 +138,16 @@ def capture_data(person_info):
             is_success = False
             break
 
-        if len(face_data) == 70:
+        if len(face_data) == 50:
             break
 
     video.release()
     cv2.destroyAllWindows()
 
-    if len(face_data) == 70 and is_success:
+    if len(face_data) == 50 and is_success:
         # Save faces in pickle file
         face_data = np.array(face_data)
-        face_data = face_data.reshape(70, -1)  # Reshape to (number of samples, flattened image size)
+        face_data = face_data.reshape(50, -1)  # Reshape to (number of samples, flattened image size)
 
         # Ensure the data directory exists
         if not os.path.exists('data'):
@@ -144,13 +155,13 @@ def capture_data(person_info):
 
         # Save the student_info
         if 'student_info.pkl' not in os.listdir('data/'):
-            student_info = [person_info] * 70
+            student_info = [person_info] * 50
             with open('data/student_info.pkl', 'wb') as f:
                 pickle.dump(student_info, f)
         else:
             with open('data/student_info.pkl', 'rb') as f:
                 student_info = pickle.load(f)
-            student_info.extend([person_info] * 70)
+            student_info.extend([person_info] * 50)
             with open('data/student_info.pkl', 'wb') as f:
                 pickle.dump(student_info, f)
 

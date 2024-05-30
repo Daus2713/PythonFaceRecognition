@@ -1,8 +1,7 @@
-from tkinter import *
+from tkinter import Frame, Label, Button, BOTH, Text, LEFT, END
 from PIL import Image, ImageTk
 from sklearn.neighbors import KNeighborsClassifier
 import cv2
-import subprocess
 import platform
 import os
 import csv
@@ -11,11 +10,12 @@ import pickle
 from datetime import datetime
 
 # Global variables
-global check_attendance_frame, menu_function, lbl_video, video, knn, facedetect, attend_button, toggle_auto_button, latest_attendance, auto_mode, action_text,action_log, date
+global check_attendance_frame, menu_function, lbl_video, video, knn, facedetect, attend_button, toggle_auto_button, latest_attendance, auto_mode, action_text,action_log, date, camera_index
 
-def check_attendance_init(parent_frame, menu):
-    global check_attendance_frame, menu_function
+def check_attendance_init(parent_frame, menu, camera_no):
+    global check_attendance_frame, menu_function, camera_index
     menu_function = menu
+    camera_index = camera_no
 
     check_attendance_frame = Frame(parent_frame, width=1152, height=710, bg="#86c287")
     check_attendance_frame.pack(anchor="center", fill=BOTH, pady=25, padx=55)
@@ -55,7 +55,8 @@ def init_face_detect():
     facedetect = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 
     # Initialize video capture
-    video = cv2.VideoCapture(0)
+    video = cv2.VideoCapture(camera_index)
+
 
     lbl_video = Label(check_attendance_frame)
     lbl_video.pack()
@@ -167,10 +168,8 @@ def open_csv_file(file_path):
     if os.path.isfile(file_path):
         if platform.system() == 'Windows':
             os.startfile(file_path)
-        elif platform.system() == 'Darwin':  # macOS
-            subprocess.call(('open', file_path))
-        else:  # Linux
-            subprocess.call(('xdg-open', file_path))
+        else:
+            print("Only windows supported for this application")
     else:
         print(f"File {file_path} does not exist")
 
