@@ -2,19 +2,19 @@ import cv2
 import numpy as np
 import os
 import pickle
-from tkinter import Tk, Frame, Label, Button, BOTH, Entry, LEFT
+from tkinter import Frame, Label, Button, BOTH, Entry, LEFT
 from PIL import Image, ImageTk
-
 
 global capture_face_frame, is_success, menu_function, camera_index
 
 
+# Start capture data page
 def capture_data_init(parent_frame, menu, camera_no):
     global capture_face_frame, menu_function, camera_index
     menu_function = menu
     camera_index = camera_no
 
-    capture_face_frame = Frame(parent_frame,  width=1152, height=710, bg="#86c287")
+    capture_face_frame = Frame(parent_frame, width=1152, height=710, bg="#86c287")
     capture_face_frame.pack(anchor="center", fill=BOTH, pady=50, padx=55)
 
     go_menu_button = Button(capture_face_frame, text="Go Back", bg="white", command=menu_function, font=("Georgia", 12))
@@ -31,9 +31,9 @@ def capture_data_init(parent_frame, menu, camera_no):
     image_label.pack(anchor="center", pady=10, padx=15)
 
     instruction_text = """
-    * The red square border detects the face, and the number at the top left indicates the number of frames that have been captured.
-    * The system needs to capture 50 frames of the face before adding the data into the system.
-    * Make sure to adjust your face to face straight towards the camera so the system can detect your face.
+    * The red square border detects the face, and the number at the top left indicates the number of face data that have been captured.
+    * The system needs to capture 50 frames of the face before adding the your face data into the system.
+    * Try to adjust your face towards the camera and make sure the red rectangle appear to confirm your face
     * Press 'e' key while system capturing your face to stop and exit the process
     """
 
@@ -41,7 +41,8 @@ def capture_data_init(parent_frame, menu, camera_no):
     instruction_label = Label(capture_face_frame, text=instruction_text, justify=LEFT, font=("Georgia", 12))
     instruction_label.pack(anchor="center", pady=12, padx=20)
 
-    form_instruction = Label(capture_face_frame, text="Please fill in name and matric no before start capturing!", bg="#86c287")
+    form_instruction = Label(capture_face_frame, text="Please fill in name and matric no before start capturing!",
+                             bg="#86c287")
     form_instruction.pack(anchor="center", pady=2)
 
     # Create a form for name and matric no
@@ -62,16 +63,12 @@ def capture_data_init(parent_frame, menu, camera_no):
     matric_entry = Entry(form_frame, width=50)
     matric_entry.grid(row=1, column=1, padx=20, pady=5)
 
-    # camera_entry = Entry(capture_face_frame, width=10)
-    # camera_entry.grid( padx=20, pady=5)
-    # camera_entry.insert(0,"0")
-
-    start_capture_button = Button(capture_face_frame, font=("Georgia", 12), text="Start Capture", command=lambda : check_capture(name_entry, matric_entry))
+    start_capture_button = Button(capture_face_frame, font=("Georgia", 12), text="Start Capture",
+                                  command=lambda: check_capture(name_entry, matric_entry))
     start_capture_button.pack(anchor="center", pady=5, padx=5)
 
 
-
-
+# Check name and matric no. is present before start running camera
 def check_capture(name_entry, matric_entry):
     global is_success
     if not name_entry.get():
@@ -80,9 +77,10 @@ def check_capture(name_entry, matric_entry):
         matric_entry.insert(0, "Missing required value!")
     else:
         is_success = True
-        capture_data(name_entry.get()+"_"+matric_entry.get())
+        capture_data(name_entry.get() + "_" + matric_entry.get())
 
 
+# Display response after user done capturing face
 def after_capture_feedback(name_matric):
     for widget in capture_face_frame.winfo_children():
         widget.destroy()
@@ -95,22 +93,19 @@ def after_capture_feedback(name_matric):
         person_info.pack(anchor="center", pady=10)
 
     else:
-        failure_text = Label(capture_face_frame, text="You pressed 'e' key. The system forced to exit", font=("Georgia", 18))
+        failure_text = Label(capture_face_frame, text="You pressed 'e' key. The system forced to exit",
+                             font=("Georgia", 18))
         failure_text.pack(anchor="center", pady=20)
 
     main_menu_button = Button(capture_face_frame, text="Main menu", command=menu_function, font=("Georgia", 12))
     main_menu_button.pack(anchor="center", pady=10)
 
 
-
-
+# Handle capturing face data from user and save in pickle file
 def capture_data(person_info):
-
-
     # Initialize video capture and face detector
-    video = cv2.VideoCapture(camera_index)  # 0 for webcam
+    video = cv2.VideoCapture(camera_index)
     facedetect = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
-
 
     face_data = []
     i = 0
@@ -176,9 +171,6 @@ def capture_data(person_info):
             with open('data/face_data.pkl', 'wb') as f:
                 pickle.dump(faces, f)
 
-
         print("Face data and labels saved successfully.")
 
-
     after_capture_feedback(person_info)
-
